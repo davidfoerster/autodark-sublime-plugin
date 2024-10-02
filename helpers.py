@@ -1,6 +1,6 @@
 import sublime
 
-from typing import Callable, Any, Literal, TypeVar, cast
+from typing import Callable, Any, Final, Literal, Sequence, TypeVar, cast
 from functools import wraps, reduce
 from types import MappingProxyType
 import operator
@@ -44,18 +44,20 @@ def settings_watcher(prop_selector: str):
     return decorator
 
 
-colorSchemeMap = ("light", "dark", "light")
+ColorScheme = Literal["default", "dark", "light"]
+colorSchemeMap: Final[Sequence[ColorScheme]] = ColorScheme.__args__
+ColorSchemeEnum = Literal[range(len(colorSchemeMap))]
 
 
-def parse_dbus_call(output: str) -> Literal["dark", "light"]:
+def parse_dbus_call(output: str) -> ColorScheme:
     result = json.loads(output)
-    system_scheme: Literal[0, 1, 2] = result["data"][0]["data"]
+    system_scheme: ColorSchemeEnum = result["data"][0]["data"]
     return cast(Any, colorSchemeMap[system_scheme])
 
 
-def parse_dbus_monitor(output: str) -> Literal["dark", "light"]:
+def parse_dbus_monitor(output: str) -> ColorScheme:
     result = json.loads(output)
-    system_scheme: Literal[0, 1, 2] = result["payload"]["data"][2]["data"]
+    system_scheme: ColorSchemeEnum = result["payload"]["data"][2]["data"]
     return cast(Any, colorSchemeMap[system_scheme])
 
 
