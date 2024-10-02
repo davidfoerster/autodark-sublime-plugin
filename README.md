@@ -14,8 +14,10 @@ Fix auto dark mode for sublime v4 on Linux. Sublime text 4 supposedly has such a
 - Edit your preferences and configure the following keys:
     - `dark_color_scheme`
     - `light_color_scheme`
+    - `default_color scheme` (`dark`, `light`, or a color scheme name)
     - `dark_theme`
     - `light_theme`
+    - `default_theme` (`dark`, `light`, or a theme name)
 - Either from the context menu (under View), or from the command pallet (search for AutoDark)
     - `System`: Sublime follows the system settings
     - `Light`: Sublime sticks to only light mode
