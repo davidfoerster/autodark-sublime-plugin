@@ -15,7 +15,9 @@ import shutil
 import contextlib
 import uuid
 
-from .helpers import settings_watcher, read_system_theme, parse_dbus_monitor
+from .helpers import (
+    settings_watcher, read_system_theme, parse_dbus_monitor,
+    ColorScheme)
 from .lifecycle import lifecycle, CycleStage
 from .logger import logger
 
@@ -175,15 +177,25 @@ def unmonitor():
         logger.info("Daemon stopped")
 
 
-def change_color_scheme(new_scheme: str, old_scheme: Optional[str] = None):
+def change_color_scheme(new_scheme: ColorScheme, old_scheme: Optional[ColorScheme] = None):
     settings = sublime.load_settings("Preferences.sublime-settings")
     ui_info = sublime.ui_info()
-    if (theme := settings.get(f"{new_scheme}_theme")) != ui_info.get("theme").get("resolved_value"):
-        settings["theme"] = theme
-    if (color_scheme := settings.get(f"{new_scheme}_color_scheme")) != ui_info.get(
-        "color_scheme"
-    ).get("resolved_value"):
-        settings["color_scheme"] = color_scheme
+    for what in ("color_scheme", "theme"):
+        value = settings.get(f"{new_scheme}_{what}")
+        if new_scheme == "default":
+            # Desktops may ask applications to use "default" UI colors. Let
+            # users choose what to do through configuration.
+            if not value:
+                # ...but if they don't we'll choose for them.
+                # In GNOME and Sublime Text the default would be "light".
+                value = "light"
+            if value in ("light", "dark"):
+                # These special aliases are resolved through their respective
+                # configuration settings.
+                new_scheme = value
+                value = settings.get(f"{new_scheme}_{what}")
+        if value != ui_info.get(what).get("resolved_value"):
+            settings[what] = value
 
     if new_scheme != old_scheme:
         logger.info(f"Color scheme change detected: previous={old_scheme}, new={new_scheme}")
