@@ -44,18 +44,18 @@ def settings_watcher(prop_selector: str):
     return decorator
 
 
-colorSchemeMap = MappingProxyType({1: "dark", 2: "light"})
+colorSchemeMap = ("light", "dark", "light")
 
 
 def parse_dbus_call(output: str) -> Literal["dark", "light"]:
     result = json.loads(output)
-    system_scheme: Literal[1, 2] = result["data"][0]["data"]
+    system_scheme: Literal[0, 1, 2] = result["data"][0]["data"]
     return cast(Any, colorSchemeMap[system_scheme])
 
 
 def parse_dbus_monitor(output: str) -> Literal["dark", "light"]:
     result = json.loads(output)
-    system_scheme: Literal[1, 2] = result["payload"]["data"][2]["data"]
+    system_scheme: Literal[0, 1, 2] = result["payload"]["data"][2]["data"]
     return cast(Any, colorSchemeMap[system_scheme])
 
 
